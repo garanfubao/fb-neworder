@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         val rv = findViewById<RecyclerView>(R.id.recycler)
         rv.layoutManager = LinearLayoutManager(this)
-        adapter = OrderAdapter()
+        adapter = OrderAdapter { order -> confirmDone(order) }
         rv.adapter = adapter
 
         findViewById<Button>(R.id.btnStopAlarm).setOnClickListener {
@@ -66,6 +66,17 @@ class MainActivity : AppCompatActivity() {
         adapter.submit(orders)
         status.text = OrderStore.status
         empty.visibility = if (orders.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun confirmDone(order: Order) {
+        AlertDialog.Builder(this)
+            .setTitle("Đơn đã xong?")
+            .setMessage((order.items ?: "Đơn này") + "\n\nẨn khỏi danh sách?")
+            .setPositiveButton("Xong ✓") { _, _ ->
+                OrderService.markDone(this, order.id)
+            }
+            .setNegativeButton("Huỷ", null)
+            .show()
     }
 
     // ----- Quyen + khoi dong service -----

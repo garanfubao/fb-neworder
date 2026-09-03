@@ -3,6 +3,7 @@ package com.fubao.orderdisplay
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
@@ -10,7 +11,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-class OrderAdapter : RecyclerView.Adapter<OrderAdapter.VH>() {
+class OrderAdapter(
+    private val onDone: (Order) -> Unit
+) : RecyclerView.Adapter<OrderAdapter.VH>() {
 
     private var data: List<Order> = emptyList()
 
@@ -26,6 +29,7 @@ class OrderAdapter : RecyclerView.Adapter<OrderAdapter.VH>() {
         val phone: TextView = v.findViewById(R.id.txtPhone)
         val note: TextView = v.findViewById(R.id.txtNote)
         val pay: TextView = v.findViewById(R.id.txtPay)
+        val done: Button = v.findViewById(R.id.btnDone)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -45,6 +49,7 @@ class OrderAdapter : RecyclerView.Adapter<OrderAdapter.VH>() {
         val payText = listOfNotNull(o.totalPrice, o.paymentMethod).joinToString(" · ")
         setOrHide(holder.pay, "💵 ", payText.ifEmpty { null })
         holder.time.text = formatTime(o.receivedAt)
+        holder.done.setOnClickListener { onDone(o) }
     }
 
     private fun setOrHide(tv: TextView, prefix: String, value: String?) {

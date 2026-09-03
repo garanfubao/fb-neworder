@@ -52,9 +52,22 @@ class OrderService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_STOP_ALARM) {
-            main.removeCallbacks(stopAlarmRunnable)
-            AlarmPlayer.stop()
+        when (intent?.action) {
+            ACTION_STOP_ALARM -> {
+                main.removeCallbacks(stopAlarmRunnable)
+                AlarmPlayer.stop()
+            }
+            ACTION_DONE -> {
+                val id = intent.getStringExtra("id")
+                if (!id.isNullOrEmpty()) {
+                    DoneIds.add(this, id)          // nho de khong hien lai
+                    OrderStore.remove(id)          // an ngay tren bang
+                    try {
+                        ws?.send(JSONObject().put("type", "done").put("id", id).toString())
+                    } catch (_: Exception) {
+                    }
+                }
+            }
         }
         return START_STICKY
     }
@@ -122,6 +135,13 @@ class OrderService : Service() {
                     val o = Order.fromJson(json.getJSONObject("order"))
                     if (OrderStore.add(o)) onNewOrder(o)
                 }
+                "removed" -> {
+                    val id = json.optString("id")
+                    if (id.isNotEmpty()) {
+                        DoneIds.add(this, id)
+                        OrderStore.remove(id)
+                    }
+                }
             }
         } catch (e: Exception) {
             Log.e("OrderService", "parse loi", e)
@@ -163,6 +183,7 @@ class OrderService : Service() {
 
     companion object {
         const val ACTION_STOP_ALARM = "com.fubao.orderdisplay.STOP_ALARM"
+        const val ACTION_DONE = "com.fubao.orderdisplay.DONE"
 
         fun start(ctx: Context) {
             val i = Intent(ctx, OrderService::class.java)
@@ -172,6 +193,13 @@ class OrderService : Service() {
 
         fun stopAlarm(ctx: Context) {
             val i = Intent(ctx, OrderService::class.java).setAction(ACTION_STOP_ALARM)
+            ctx.startService(i)
+        }
+
+        fun markDone(ctx: Context, id: String) {
+            val i = Intent(ctx, OrderService::class.java)
+                .setAction(ACTION_DONE)
+                .putExtra("id", id)
             ctx.startService(i)
         }
     }

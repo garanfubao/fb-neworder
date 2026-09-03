@@ -100,7 +100,20 @@ wss.on('connection', (ws, req) => {
   }
   ws.isAlive = true;
   ws.on('pong', () => { ws.isAlive = true; });
-  ws.on('message', () => {}); // may D3 khong can gui gi len
+  ws.on('message', (raw) => {
+    let m;
+    try { m = JSON.parse(raw.toString()); } catch (_) { return; }
+    // May D3 bam "Xong" -> xoa don khoi server + bao cac may khac xoa theo
+    if (m && m.type === 'done' && m.id) {
+      const before = orders.length;
+      orders = orders.filter((o) => o.id !== m.id);
+      if (orders.length !== before) {
+        persist();
+        broadcast({ type: 'removed', id: m.id });
+        console.log('Don xong, da xoa:', m.id);
+      }
+    }
+  });
   // Gui 50 don gan nhat de bang hien ngay khi mo app (khong keu chuong)
   ws.send(JSON.stringify({ type: 'snapshot', orders: orders.slice(-50) }));
   console.log('May D3 da ket noi. Tong ket noi:', wss.clients.size);
