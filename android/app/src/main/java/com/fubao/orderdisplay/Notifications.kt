@@ -71,6 +71,7 @@ object Notifications {
             append(o.items ?: "Don moi")
             o.address?.let { append("\n📍 ").append(it) }
             o.phone?.let { append("\n📞 ").append(it) }
+            o.note?.let { append("\n📝 ").append(it) }
         }
         val n = NotificationCompat.Builder(ctx, CH_NEW)
             .setContentTitle("🔔 CÓ ĐƠN MỚI")
