@@ -1,9 +1,9 @@
 package com.fubao.orderdisplay
 
 import android.content.Context
+import android.content.res.AssetFileDescriptor
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.RingtoneManager
 import android.util.Log
 
 /** Phat chuong lap lai qua luong ALARM -> keu ca khi dang o app khac. */
@@ -14,8 +14,7 @@ object AlarmPlayer {
     fun start(ctx: Context) {
         if (mp != null) return
         try {
-            val uri = RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_ALARM)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val afd: AssetFileDescriptor = ctx.resources.openRawResourceFd(R.raw.order_alarm)
             mp = MediaPlayer().apply {
                 setAudioAttributes(
                     AudioAttributes.Builder()
@@ -23,7 +22,8 @@ object AlarmPlayer {
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build()
                 )
-                setDataSource(ctx, uri)
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                afd.close()
                 isLooping = true
                 setOnPreparedListener { it.start() }
                 prepareAsync()
