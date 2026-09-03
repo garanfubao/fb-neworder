@@ -27,8 +27,26 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      - name: Decode signing keystore (neu da tao Secret)
+        id: ks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/fubao-release.p12"
+            echo "path=$RUNNER_TEMP/fubao-release.p12" >> "$GITHUB_OUTPUT"
+            echo "Da co keystore -> ky bang key co dinh"
+          else
+            echo "Chua co Secret SIGNING_KEYSTORE_BASE64 -> tam ky bang debug key"
+          fi
+
       - name: Build release APK
         working-directory: android
+        env:
+          KEYSTORE_FILE: ${{ steps.ks.outputs.path }}
+          KEYSTORE_PASSWORD: fubaostore
+          KEY_ALIAS: fubao
+          KEY_PASSWORD: fubaostore
         run: gradle assembleRelease --no-daemon
 
       - name: Upload APK

@@ -3,6 +3,11 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+// CI se dat KEYSTORE_FILE (giai ma tu GitHub Secret) de ky co dinh.
+// May local khong co bien nay -> tu dung debug key, van build binh thuong.
+def envKeystore = System.getenv('KEYSTORE_FILE')
+def hasReleaseKeystore = envKeystore != null && !envKeystore.trim().isEmpty()
+
 android {
     namespace 'com.fubao.orderdisplay'
     compileSdk 34
@@ -15,11 +20,22 @@ android {
         versionName '1.0'
     }
 
+    signingConfigs {
+        release {
+            if (hasReleaseKeystore) {
+                storeFile file(envKeystore)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+                storeType 'PKCS12'
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            // Ky bang debug key de `assembleRelease` ra file APK cai duoc ngay.
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
         }
     }
 

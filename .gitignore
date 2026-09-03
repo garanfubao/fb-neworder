@@ -12,3 +12,8 @@ android/captures/
 server/node_modules/
 server/.env
 server/orders.json
+
+# Signing key - KHONG BAO GIO commit vao repo (dua vao GitHub Secret)
+*.p12
+*.jks
+*.keystore
