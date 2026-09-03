@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FubaoOrder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#F59E0B</item>
+        <item name="colorPrimaryVariant">#D97706</item>
+        <item name="colorOnPrimary">#111827</item>
+        <item name="android:statusBarColor">#111827</item>
+    </style>
+</resources>

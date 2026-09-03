@@ -1,0 +1,22 @@
+# Render Blueprint. Vao Render > New > Blueprint, tro toi repo nay.
+# Hoac tao thu cong 1 Web Service voi cac gia tri tuong ung ben duoi.
+services:
+  - type: web
+    name: fubao-order-server
+    runtime: node
+    plan: starter          # ban dang tra phi, giu web service luon chay (khong sleep)
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: API_KEY
+        sync: false        # tu nhap 1 chuoi bi mat; DUNG chung gia tri nay cho n8n + app
+      - key: MAX_ORDERS
+        value: "100"
+      - key: DATA_FILE
+        value: /var/data/orders.json
