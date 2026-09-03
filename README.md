@@ -67,6 +67,35 @@ Workflow hiện chưa tách riêng field `note`, nên app sẽ để trống dò
 
 Server và app đã sẵn sàng nhận `note` nếu có.
 
+### (Mới) Tự nhắn khách "đang giao hàng" khi bấm **Xong**
+Khi bếp bấm **Xong** trên máy D3, server sẽ nhờ n8n nhắn Messenger cho đúng khách:
+> *"Bếp đang trên đường giao hàng, mình xuống sảnh nhận cơm giúp em nha"*
+
+Cần làm **2 việc**:
+
+**1) Gửi PSID (ID Messenger của khách) kèm theo đơn.** Mở node **"Notify Desktop App"**,
+trong `jsonBody` thêm 1 dòng lấy ID người gửi từ Messenger Trigger, ví dụ:
+```
+psid: $('Messenger Trigger').item.json.entry[0].messaging[0].sender.id
+```
+(Tên node và đường dẫn tuỳ workflow của bạn — cốt lấy đúng `sender.id` của khách. Không
+có PSID thì server sẽ bỏ qua bước nhắn tin, các phần khác vẫn chạy bình thường.)
+
+**2) Tạo webhook n8n để gửi tin.** Thêm 1 flow nhỏ trong n8n:
+- **Webhook** (Method `POST`, ví dụ path `fubao-delivery`) → nhận `{ psid, message, orderId, ... }`.
+- Nối sang node gửi Messenger (dùng **credential Facebook có sẵn** mà chatbot đang trả lời khách):
+  gửi tới người nhận `={{ $json.body.psid }}`, nội dung `={{ $json.body.message }}`.
+  (Nếu dùng HTTP Request tới Graph API: `POST https://graph.facebook.com/v21.0/me/messages`
+  body `{"recipient":{"id":"{{ $json.body.psid }}"},"messaging_type":"RESPONSE","message":{"text":"{{ $json.body.message }}"}}`.)
+- Server gửi kèm header `X-Api-Key` = đúng `API_KEY`; muốn chắc thì cho webhook kiểm tra header này.
+
+**3) Bật ở Render.** Vào Environment của server, thêm biến:
+- `N8N_DELIVERY_WEBHOOK_URL` = URL production của webhook vừa tạo.
+- (tuỳ chọn) `DELIVERY_MESSAGE` = đổi nội dung tin nhắn mà không cần sửa code.
+
+> Đơn nằm trong 24h kể từ lúc khách nhắn nên tin gửi bình thường (đúng cửa sổ nhắn tin của
+> Messenger). Tin chỉ gửi **1 lần** cho máy thực sự bấm Xong đầu tiên.
+
 ---
 
 ## C. Tạo file APK
@@ -119,8 +148,8 @@ mở app khác.
 - Khi có đơn mới, app phát chuông **lặp lại theo luồng ALARM** → to, nghe rõ trong bếp và
   kêu **kể cả khi bạn đang ở app POS khác**.
 - Chuông **tự tắt sau 60 giây**, hoặc bấm **🔕 Tắt chuông** trong app để tắt ngay.
-- Muốn đổi tiếng chuông: đổi *âm báo thức mặc định* của máy (Cài đặt âm thanh). Muốn dùng
-  file nhạc riêng thì báo tôi, tôi bỏ file mp3 vào `res/raw` và trỏ `AlarmPlayer` tới nó.
+- Tiếng chuông là file `android/app/src/main/res/raw/order_alarm.mp3` (đã nhúng sẵn trong
+  app). Muốn đổi: thay file mp3 đó bằng file khác **cùng tên** `order_alarm.mp3` rồi build lại APK.
 
 ## Ghi chú kỹ thuật
 - Server dùng WebSocket (`ws`), giữ 100 đơn gần nhất. Máy mới kết nối sẽ nhận 50 đơn gần

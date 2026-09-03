@@ -16,6 +16,14 @@ const API_KEY = process.env.API_KEY || 'doi-key-nay-di';
 const MAX_ORDERS = parseInt(process.env.MAX_ORDERS || '100', 10);
 const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, 'orders.json');
 
+// Khi bam "Xong": bao n8n gui tin Messenger cho khach.
+// - N8N_DELIVERY_WEBHOOK_URL: URL webhook cua node n8n (bo trong thi tinh nang tat).
+// - DELIVERY_MESSAGE: noi dung tin nhan (co the doi tren Render, khong can sua code).
+const N8N_DELIVERY_WEBHOOK_URL = process.env.N8N_DELIVERY_WEBHOOK_URL || '';
+const DELIVERY_MESSAGE =
+  process.env.DELIVERY_MESSAGE ||
+  'Bếp đang trên đường giao hàng, mình xuống sảnh nhận cơm giúp em nha';
+
 // ---------- Luu tru don hang ----------
 let orders = [];
 try {
@@ -68,6 +76,8 @@ app.post('/orders', (req, res) => {
     note: b.note ?? null,
     totalPrice: b.totalPrice ?? null,
     paymentMethod: b.paymentMethod ?? null,
+    // PSID Messenger cua khach -> de bam "Xong" con nhan tin bao giao hang.
+    psid: b.psid ?? b.senderId ?? null,
   };
   orders.push(order);
   if (orders.length > MAX_ORDERS) orders = orders.slice(-MAX_ORDERS);
@@ -76,6 +86,32 @@ app.post('/orders', (req, res) => {
   console.log('Don moi:', order.id, '| items:', order.items);
   res.json({ ok: true, id: order.id });
 });
+
+// Bao n8n gui tin Messenger "dang giao hang" cho khach cua don vua xong.
+async function notifyDelivery(order) {
+  if (!N8N_DELIVERY_WEBHOOK_URL) return; // chua bat tinh nang
+  if (!order || !order.psid) {
+    console.warn('Bo qua bao giao hang: don thieu psid ->', order && order.id);
+    return;
+  }
+  try {
+    const r = await fetch(N8N_DELIVERY_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Api-Key': API_KEY },
+      body: JSON.stringify({
+        psid: order.psid,
+        message: DELIVERY_MESSAGE,
+        orderId: order.id,
+        customerName: order.customerName,
+        items: order.items,
+      }),
+    });
+    if (!r.ok) console.error('Webhook n8n tra loi HTTP', r.status);
+    else console.log('Da bao n8n gui tin giao hang | don', order.id, '| psid', order.psid);
+  } catch (e) {
+    console.error('Goi webhook n8n loi:', e.message);
+  }
+}
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
@@ -105,12 +141,15 @@ wss.on('connection', (ws, req) => {
     try { m = JSON.parse(raw.toString()); } catch (_) { return; }
     // May D3 bam "Xong" -> xoa don khoi server + bao cac may khac xoa theo
     if (m && m.type === 'done' && m.id) {
+      const doneOrder = orders.find((o) => o.id === m.id);
       const before = orders.length;
       orders = orders.filter((o) => o.id !== m.id);
       if (orders.length !== before) {
         persist();
         broadcast({ type: 'removed', id: m.id });
         console.log('Don xong, da xoa:', m.id);
+        // Gui 1 lan duy nhat: chi may thuc su xoa duoc don moi ban webhook.
+        notifyDelivery(doneOrder);
       }
     }
   });
