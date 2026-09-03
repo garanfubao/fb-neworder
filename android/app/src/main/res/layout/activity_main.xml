@@ -23,9 +23,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🍗 Đơn hàng Fubao"
+                android:text="🔔 Fubao TingTing"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -34,15 +34,24 @@
                 android:layout_height="wrap_content"
                 android:text="Chưa kết nối"
                 android:textColor="#93C5FD"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btnStopAlarm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔕 Tắt chuông"
-            android:textSize="15sp"
+            android:text="🔕 Tắt"
+            android:textSize="11sp"
+            android:letterSpacing="0"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
             android:backgroundTint="#DC2626"
             android:textColor="#FFFFFF" />
 
@@ -50,9 +59,17 @@
             android:id="@+id/btnSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="6dp"
             android:text="⚙"
-            android:textSize="15sp"
+            android:textSize="11sp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
             android:backgroundTint="#374151"
             android:textColor="#FFFFFF" />
     </LinearLayout>

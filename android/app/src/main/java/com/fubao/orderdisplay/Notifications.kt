@@ -44,7 +44,7 @@ object Notifications {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         return NotificationCompat.Builder(ctx, CH_SERVICE)
-            .setContentTitle("Man hinh don Fubao")
+            .setContentTitle("Fubao TingTing")
             .setContentText(text)
             .setSmallIcon(android.R.drawable.ic_menu_agenda)
             .setOngoing(true)
