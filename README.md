@@ -151,6 +151,14 @@ mở app khác.
 - Tiếng chuông là file `android/app/src/main/res/raw/order_alarm.mp3` (đã nhúng sẵn trong
   app). Muốn đổi: thay file mp3 đó bằng file khác **cùng tên** `order_alarm.mp3` rồi build lại APK.
 
+## Khách sửa món thì sao?
+Khi khách chỉnh đơn, chatbot gửi đơn lần 2. Server tự **thay đơn cũ bằng đơn mới** nếu đơn
+cũ **cùng khách** (trùng `psid`; chưa gắn psid thì trùng SĐT) và **chưa bấm Xong** — nên bảng
+chỉ còn **1 thẻ đúng** chứ không bị nhân đôi. Đơn đổi sẽ **kêu chuông lại** để bếp biết có
+thay đổi. (Nếu đơn cũ đã bấm Xong rồi thì đơn mới coi như đơn mới hoàn toàn.)
+
+> Muốn dedup chính xác nhất, nên gắn `psid` như mục B ở trên (SĐT chỉ là khoá dự phòng).
+
 ## Ghi chú kỹ thuật
 - Server dùng WebSocket (`ws`), giữ 100 đơn gần nhất. Máy mới kết nối sẽ nhận 50 đơn gần
   nhất để bảng không trống (không kêu chuông cho mấy đơn cũ này).

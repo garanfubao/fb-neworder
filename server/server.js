@@ -79,13 +79,32 @@ app.post('/orders', (req, res) => {
     // PSID Messenger cua khach -> de bam "Xong" con nhan tin bao giao hang.
     psid: b.psid ?? b.senderId ?? null,
   };
+
+  // Khach sua mon -> chatbot ban don lan 2. Neu con don CU CUNG KHACH chua bam Xong
+  // thi thay the (khong tao them the moi). Uu tien khop psid, khong co thi khop SDT.
+  const dupIdx = orders.findIndex((o) => sameCustomer(o, order));
+  let replacedId = null;
+  if (dupIdx !== -1) {
+    replacedId = orders[dupIdx].id;
+    orders.splice(dupIdx, 1);
+    broadcast({ type: 'removed', id: replacedId });
+  }
+
   orders.push(order);
   if (orders.length > MAX_ORDERS) orders = orders.slice(-MAX_ORDERS);
   persist();
   broadcast({ type: 'new', order });
-  console.log('Don moi:', order.id, '| items:', order.items);
-  res.json({ ok: true, id: order.id });
+  if (replacedId) console.log('Don sua: thay', replacedId, '->', order.id, '| items:', order.items);
+  else console.log('Don moi:', order.id, '| items:', order.items);
+  res.json({ ok: true, id: order.id, replaced: replacedId });
 });
+
+// Cung mot khach? Uu tien psid; chua co psid thi dung SDT lam khoa du phong.
+function sameCustomer(a, b) {
+  if (a.psid && b.psid) return a.psid === b.psid;
+  if (a.phone && b.phone) return a.phone === b.phone;
+  return false;
+}
 
 // Bao n8n gui tin Messenger "dang giao hang" cho khach cua don vua xong.
 async function notifyDelivery(order) {
