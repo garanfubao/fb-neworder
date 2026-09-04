@@ -73,7 +73,7 @@ app.post('/orders', (req, res) => {
     phone: b.phone ?? null,
     address: b.address ?? null,
     items: b.items ?? null,
-    note: b.note ?? null,
+    note: b.note ?? b.notes ?? null,
     totalPrice: b.totalPrice ?? null,
     paymentMethod: b.paymentMethod ?? null,
     // PSID Messenger cua khach -> de bam "Xong" con nhan tin bao giao hang.
