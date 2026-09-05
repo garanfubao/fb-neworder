@@ -144,6 +144,14 @@ mở app khác.
 
 ---
 
+## Dừng app cho đỡ tốn pin (đóng quán)
+Quán chỉ mở 09:00–22:00, không cần chạy 24/24. Cuối ngày bấm nút **⏻ Dừng** (thanh trên
+cùng) → app **ngắt kết nối + tắt hẳn** (không còn giữ màn hình sáng, không còn wakelock) nên
+gần như không tốn pin. Sáng mở quán chỉ cần **mở lại app** là tự kết nối nhận đơn tiếp.
+(Không cần vào Cài đặt → Buộc dừng nữa.)
+
+> Muốn app **tự tắt 22:00 / tự bật 09:00** không cần bấm tay thì báo tôi làm thêm hẹn giờ.
+
 ## Chuông báo hoạt động thế nào
 - Khi có đơn mới, app phát chuông **lặp lại theo luồng ALARM** → to, nghe rõ trong bếp và
   kêu **kể cả khi bạn đang ở app POS khác**.

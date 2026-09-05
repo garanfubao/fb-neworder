@@ -43,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnStopAlarm).setOnClickListener {
             OrderService.stopAlarm(this)
         }
+        findViewById<Button>(R.id.btnStopApp).setOnClickListener {
+            confirmStopApp()
+        }
         findViewById<Button>(R.id.btnSettings).setOnClickListener {
             showSettings()
         }
@@ -66,6 +69,20 @@ class MainActivity : AppCompatActivity() {
         adapter.submit(orders)
         status.text = OrderStore.status
         empty.visibility = if (orders.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    // Dung han service (ngat WebSocket + tha wakelock) roi dong app -> tiet kiem pin khi dong cua.
+    private fun confirmStopApp() {
+        AlertDialog.Builder(this)
+            .setTitle("Dừng nhận đơn?")
+            .setMessage("Sẽ ngắt kết nối và tắt app để đỡ tốn pin.\nMở lại app khi mở quán để nhận đơn tiếp.")
+            .setPositiveButton("Dừng ⏻") { _, _ ->
+                AlarmPlayer.stop()
+                stopService(Intent(this, OrderService::class.java))
+                finishAndRemoveTask()
+            }
+            .setNegativeButton("Huỷ", null)
+            .show()
     }
 
     private fun confirmDone(order: Order) {
