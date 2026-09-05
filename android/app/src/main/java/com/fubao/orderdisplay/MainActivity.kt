@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Dừng nhận đơn?")
             .setMessage("Sẽ ngắt kết nối và tắt app để đỡ tốn pin.\nMở lại app khi mở quán để nhận đơn tiếp.")
-            .setPositiveButton("Dừng ⏻") { _, _ ->
+            .setPositiveButton("Dừng") { _, _ ->
                 AlarmPlayer.stop()
                 stopService(Intent(this, OrderService::class.java))
                 finishAndRemoveTask()

@@ -1,0 +1,33 @@
+<!-- Logo ga con Fubao CO MAU - dung cho large icon trong bang thong bao (keo xuong). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Dau ga: vong tron vang -->
+    <path
+        android:fillColor="#FDDC2D"
+        android:pathData="M12,1 A11,11 0 1,0 12,23 A11,11 0 1,0 12,1 Z" />
+    <!-- Mat trai: vien trang + trong den -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8.3,7.9 A2.4,3.2 0 1,0 8.3,14.3 A2.4,3.2 0 1,0 8.3,7.9 Z" />
+    <path
+        android:fillColor="#1F2937"
+        android:pathData="M8.3,8.4 A1.9,2.7 0 1,0 8.3,13.8 A1.9,2.7 0 1,0 8.3,8.4 Z" />
+    <!-- Mat phai -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M15.7,7.9 A2.4,3.2 0 1,0 15.7,14.3 A2.4,3.2 0 1,0 15.7,7.9 Z" />
+    <path
+        android:fillColor="#1F2937"
+        android:pathData="M15.7,8.4 A1.9,2.7 0 1,0 15.7,13.8 A1.9,2.7 0 1,0 15.7,8.4 Z" />
+    <!-- Mo cam -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M12,15 A2.5,1.6 0 1,0 12,18.2 A2.5,1.6 0 1,0 12,15 Z" />
+    <!-- Tim do tren tran -->
+    <path
+        android:fillColor="#DC2626"
+        android:pathData="M12,7 C11.3,6 9.8,5.7 9.8,4.7 C9.8,4 10.4,3.6 11,3.6 C11.5,3.6 11.8,3.9 12,4.2 C12.2,3.9 12.5,3.6 13,3.6 C13.6,3.6 14.2,4 14.2,4.7 C14.2,5.7 12.7,6 12,7 Z" />
+</vector>

@@ -6,14 +6,32 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 
 object Notifications {
     const val CH_SERVICE = "fubao_service"
     const val CH_NEW = "fubao_new_order"
     const val SERVICE_NOTIF_ID = 1001
+    private const val BRAND_COLOR = 0xFFFDDC2D.toInt() // vang Fubao (mau nhan)
     private var newOrderCounter = 2000
+
+    /** Ve logo ga co mau ra bitmap de lam large icon (hien mau ca tren may Android goc). */
+    private fun fubaoLargeIcon(ctx: Context): Bitmap? = try {
+        val d = ContextCompat.getDrawable(ctx, R.drawable.ic_fubao_color)
+        if (d == null) null else {
+            val size = (96 * ctx.resources.displayMetrics.density).toInt().coerceAtLeast(96)
+            val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            d.setBounds(0, 0, size, size)
+            d.draw(Canvas(bmp))
+            bmp
+        }
+    } catch (_: Exception) {
+        null
+    }
 
     fun createChannels(ctx: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -46,7 +64,9 @@ object Notifications {
         return NotificationCompat.Builder(ctx, CH_SERVICE)
             .setContentTitle("Fubao TingTing")
             .setContentText(text)
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.ic_fubao_color)
+            .setLargeIcon(fubaoLargeIcon(ctx))
+            .setColor(BRAND_COLOR)
             .setOngoing(true)
             .setContentIntent(open)
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -77,7 +97,9 @@ object Notifications {
             .setContentTitle("🔔 CÓ ĐƠN MỚI")
             .setContentText(o.items ?: "Đơn mới")
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.ic_fubao_color)
+            .setLargeIcon(fubaoLargeIcon(ctx))
+            .setColor(BRAND_COLOR)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
